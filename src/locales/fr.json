@@ -378,5 +378,6 @@
   "managed links to be removed": "liens gérés à supprimer",
   "mmc-pack.json is missing": "mmc-pack.json est manquant",
   "mods folder is empty": "Le dossier mods est vide",
-  "mods folder not found": "Dossier mods introuvable"
+  "mods folder not found": "Dossier mods introuvable",
+  "Metadata read from CurseForge manifest.json": "Métadonnées lues depuis le manifest.json de CurseForge"
 }

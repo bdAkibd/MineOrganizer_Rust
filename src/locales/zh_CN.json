@@ -378,5 +378,6 @@
   "managed links to be removed": "要移除的托管链接",
   "mmc-pack.json is missing": "缺少 mmc-pack.json",
   "mods folder is empty": "mods 文件夹为空",
-  "mods folder not found": "未找到 mods 文件夹"
+  "mods folder not found": "未找到 mods 文件夹",
+  "Metadata read from CurseForge manifest.json": "从 CurseForge manifest.json 读取元数据"
 }

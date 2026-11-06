@@ -378,5 +378,6 @@
   "managed links to be removed": "zu entfernende verwaltete Links",
   "mmc-pack.json is missing": "mmc-pack.json fehlt",
   "mods folder is empty": "Der mods-Ordner ist leer",
-  "mods folder not found": "mods-Ordner nicht gefunden"
+  "mods folder not found": "mods-Ordner nicht gefunden",
+  "Metadata read from CurseForge manifest.json": "Metadaten aus CurseForge manifest.json gelesen"
 }

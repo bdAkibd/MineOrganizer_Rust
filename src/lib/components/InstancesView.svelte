@@ -104,7 +104,7 @@
             <!-- Launcher Tag & Status -->
             <div class="flex items-center justify-between">
               <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-zinc-800 text-zinc-300 border border-zinc-700/60">
-                {inst.launcher}
+                {t(inst.launcher)}
               </span>
               {#if isActiveForProfile}
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
@@ -127,10 +127,10 @@
             <!-- Badges (MC, Loader, Status) -->
             <div class="flex flex-wrap items-center gap-1.5 text-xs">
               <span class="px-2 py-0.5 rounded bg-zinc-800/80 border border-zinc-700/60 text-zinc-300 font-mono text-[11px]">
-                MC {inst.minecraft_version}
+                MC {inst.minecraft_version === 'Not detected' ? t('Not detected') : inst.minecraft_version}
               </span>
               <span class="px-2 py-0.5 rounded bg-violet-500/10 border border-violet-500/20 text-violet-300 font-medium text-[11px]">
-                {inst.loader} {inst.loader_version ? `(${inst.loader_version})` : ''}
+                {t(inst.loader)} {inst.loader_version ? `(${inst.loader_version})` : ''}
               </span>
             </div>
 

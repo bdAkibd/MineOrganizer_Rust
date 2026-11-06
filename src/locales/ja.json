@@ -378,5 +378,6 @@
   "managed links to be removed": "削除予定の管理リンク",
   "mmc-pack.json is missing": "mmc-pack.json がありません",
   "mods folder is empty": "modsフォルダーは空です",
-  "mods folder not found": "mods フォルダが見つかりません"
+  "mods folder not found": "mods フォルダが見つかりません",
+  "Metadata read from CurseForge manifest.json": "CurseForge manifest.json からメタデータを読み込みました"
 }

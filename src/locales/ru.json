@@ -378,5 +378,6 @@
   "managed links to be removed": "удалено ссылок MineOrganizer",
   "mmc-pack.json is missing": "Нет mmc-pack.json",
   "mods folder is empty": "Папка mods пуста",
-  "mods folder not found": "Папка mods не найдена"
+  "mods folder not found": "Папка mods не найдена",
+  "Metadata read from CurseForge manifest.json": "Метаданные прочитаны из manifest.json CurseForge"
 }
