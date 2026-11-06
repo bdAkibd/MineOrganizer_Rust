@@ -1,0 +1,30 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node & Frontend
+node_modules
+/build
+/.svelte-kit
+/dist
+/package
+.env
+.env.*
+!.env.example
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Rust build artifacts
+/src-tauri/target/
+/src-tauri/**/*.rs.bk
+
+# Local application & test directories
+/exports/
+/mods_library/
+/rollback/
+user_data.json
+*.download_tmp
+
+# IDEs
+.vscode/
+.idea/
