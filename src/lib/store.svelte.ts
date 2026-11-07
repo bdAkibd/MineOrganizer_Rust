@@ -54,14 +54,14 @@ class AppState {
   toasts = $state<Toast[]>([]);
 
   // Computed
-  activeProfile = $derived<Profile | null>(() => {
+  activeProfile = $derived.by<Profile | null>(() => {
     if (!this.userData.active_profile_id) {
       return this.userData.profiles[0] || null;
     }
     return this.userData.profiles.find((p) => p.id === this.userData.active_profile_id) || this.userData.profiles[0] || null;
   });
 
-  filteredMods = $derived<ModFile[]>(() => {
+  filteredMods = $derived.by<ModFile[]>(() => {
     return this.libraryMods.filter((mod) => {
       // Search text
       if (this.searchQuery.trim()) {
@@ -105,7 +105,7 @@ class AppState {
     });
   });
 
-  allTags = $derived<string[]>(() => {
+  allTags = $derived.by<string[]>(() => {
     const set = new Set<string>();
     for (const tags of Object.values(this.userData.mod_tags)) {
       for (const t of tags) {
@@ -115,7 +115,7 @@ class AppState {
     return Array.from(set).sort();
   });
 
-  allMcVersions = $derived<string[]>(() => {
+  allMcVersions = $derived.by<string[]>(() => {
     const set = new Set<string>();
     for (const mod of this.libraryMods) {
       for (const v of mod.metadata.mc_versions) {
@@ -186,7 +186,7 @@ class AppState {
   }
 
   async toggleModInActiveProfile(modSha256OrSha1: string) {
-    const prof = this.activeProfile();
+    const prof = this.activeProfile;
     if (!prof) {
       this.showToast('Please create or select a profile first.', 'info');
       return;
@@ -214,10 +214,26 @@ class AppState {
   }
 
   isModActiveInProfile(mod: ModFile): boolean {
-    const prof = this.activeProfile();
+    const prof = this.activeProfile;
     if (!prof) return false;
     const hash = mod.sha256 || mod.sha1;
     return prof.enabled_mod_hashes.includes(hash) || prof.active_mods.includes(hash);
+  }
+
+  async saveProfileItem(profile: Profile): Promise<Profile> {
+    try {
+      const saved = await api.saveProfileItem(profile);
+      const idx = this.userData.profiles.findIndex((p) => p.id === saved.id);
+      if (idx !== -1) {
+        this.userData.profiles[idx] = saved;
+      } else {
+        this.userData.profiles.push(saved);
+      }
+      return saved;
+    } catch (e: any) {
+      this.showToast(`Failed to save profile: ${e?.message || e}`, 'error');
+      throw e;
+    }
   }
 
   async setActiveProfile(profileId: string) {

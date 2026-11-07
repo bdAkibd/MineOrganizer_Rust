@@ -22,7 +22,7 @@
   } from '@lucide/svelte';
 
   let selectedInstancePath = $state(
-    appState.selectedInstance?.path || appState.activeProfile()?.instance_path || ''
+    appState.selectedInstance?.path || appState.activeProfile?.instance_path || ''
   );
   let availableLogFiles = $state<[string, string][]>([]);
   let selectedLogFilePath = $state<string>('');

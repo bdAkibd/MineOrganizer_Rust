@@ -22,7 +22,7 @@
   };
 
   async function handleDeployProfile() {
-    const prof = appState.activeProfile();
+    const prof = appState.activeProfile;
     if (!prof) {
       appState.showToast('Select an active profile first.', 'info');
       return;
@@ -82,11 +82,11 @@
     <h2 class="text-base font-semibold text-zinc-100 flex items-center gap-2">
       {t(sectionTitles[appState.activeTab] || 'MineOrganizer')}
     </h2>
-    {#if appState.activeProfile()}
+    {#if appState.activeProfile}
       <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-900 border border-zinc-700/60 text-[11px] text-zinc-300">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
         <span class="text-zinc-400">{t('Target')}:</span>
-        <span class="font-medium text-zinc-200">{appState.activeProfile()?.name}</span>
+        <span class="font-medium text-zinc-200">{appState.activeProfile?.name}</span>
       </div>
     {/if}
   </div>

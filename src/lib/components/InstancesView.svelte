@@ -41,7 +41,7 @@
   }
 
   function handleSelectForProfile(inst: Instance) {
-    const prof = appState.activeProfile();
+    const prof = appState.activeProfile;
     if (!prof) {
       appState.showToast('Please select a profile first', 'info');
       return;
@@ -96,7 +96,7 @@
   <div class="flex-1 overflow-y-auto p-6">
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
       {#each appState.instances as inst}
-        {@const isActiveForProfile = appState.activeProfile()?.instance_path === inst.path}
+        {@const isActiveForProfile = appState.activeProfile?.instance_path === inst.path}
         <div class="p-4 rounded-xl bg-zinc-900/60 border transition-all duration-150 flex flex-col justify-between {isActiveForProfile
           ? 'border-violet-500/60 bg-violet-950/10 shadow-lg shadow-violet-950/20'
           : 'border-[#27272a] hover:border-zinc-700 hover:bg-zinc-900'}">

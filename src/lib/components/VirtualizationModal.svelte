@@ -19,7 +19,7 @@
   async function handleConfirmApply() {
     if (!plan || !plan.mods_dir) return;
 
-    const prof = appState.activeProfile();
+    const prof = appState.activeProfile;
     if (!prof) return;
 
     const instancePath = prof.instance_path || appState.selectedInstance?.path;

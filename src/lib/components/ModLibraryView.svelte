@@ -31,7 +31,7 @@
       return { label: 'Server plugin', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30', icon: Server };
     }
 
-    const currentProf = appState.activeProfile();
+    const currentProf = appState.activeProfile;
     const currentLoader = currentProf?.loader || 'Fabric';
     const currentMc = currentProf?.minecraft_version || '1.20.1';
 
@@ -69,26 +69,26 @@
       </div>
 
       <!-- MC Version dropdown -->
-      {#if appState.allMcVersions().length > 0}
+      {#if appState.allMcVersions.length > 0}
         <select
           bind:value={appState.selectedMcVersion}
           class="bg-zinc-900 border border-zinc-700/60 text-xs text-zinc-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-violet-500"
         >
           <option value="all">{t('All Versions')}</option>
-          {#each appState.allMcVersions() as ver}
+          {#each appState.allMcVersions as ver}
             <option value={ver}>{ver}</option>
           {/each}
         </select>
       {/if}
 
       <!-- Tag filter -->
-      {#if appState.allTags().length > 0}
+      {#if appState.allTags.length > 0}
         <select
           bind:value={appState.selectedTag}
           class="bg-zinc-900 border border-zinc-700/60 text-xs text-zinc-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-violet-500"
         >
           <option value="all">{t('All Tags')}</option>
-          {#each appState.allTags() as tag}
+          {#each appState.allTags as tag}
             <option value={tag}>{tag}</option>
           {/each}
         </select>
@@ -104,14 +104,14 @@
       <div class="w-1 h-1 rounded-full bg-zinc-600"></div>
       <div>
         <span>{t('Filtered')}:</span>
-        <span class="font-mono font-semibold text-violet-400">{appState.filteredMods().length}</span>
+        <span class="font-mono font-semibold text-violet-400">{appState.filteredMods.length}</span>
       </div>
     </div>
   </div>
 
   <!-- Table Container -->
   <div class="flex-1 overflow-auto">
-    {#if appState.filteredMods().length === 0}
+    {#if appState.filteredMods.length === 0}
       <div class="h-full flex flex-col items-center justify-center text-center p-8 text-zinc-400">
         <FileBox class="w-12 h-12 text-zinc-600 mb-3" />
         <h3 class="text-sm font-semibold text-zinc-300 mb-1">{t('No mods found')}</h3>
@@ -143,7 +143,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-[#27272a]/40 text-zinc-300">
-          {#each appState.filteredMods() as mod}
+          {#each appState.filteredMods as mod}
             {@const isActive = appState.isModActiveInProfile(mod)}
             {@const badge = getStatusBadge(mod)}
             {@const BadgeIcon = badge.icon}

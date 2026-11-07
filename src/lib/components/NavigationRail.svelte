@@ -15,7 +15,7 @@
   } from '@lucide/svelte';
 
   let profileDropdownOpen = $state(false);
-  const current = $derived(appState.activeProfile());
+  const current = $derived(appState.activeProfile);
 
   const navItems = [
     { id: 'mods' as const, label: 'Mod Library', icon: Boxes },

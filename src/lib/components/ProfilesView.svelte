@@ -105,7 +105,7 @@
     {:else}
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {#each appState.userData.profiles as prof}
-          {@const isActive = prof.id === appState.activeProfile()?.id}
+          {@const isActive = prof.id === appState.activeProfile?.id}
           <div class="p-5 rounded-xl bg-zinc-900/60 border transition-all flex flex-col justify-between {isActive
             ? 'border-violet-500/60 bg-violet-950/15 shadow-xl shadow-violet-950/30'
             : 'border-[#27272a] hover:border-zinc-700'}">

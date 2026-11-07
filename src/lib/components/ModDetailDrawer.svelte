@@ -24,14 +24,11 @@
   const mod = $derived(appState.selectedMod);
   const modHash = $derived(mod?.sha256 || mod?.sha1 || '');
   const isActive = $derived(mod ? appState.isModActiveInProfile(mod) : false);
-  const tags = $derived<string[]>(() => {
-    if (!modHash) return [];
-    return appState.userData.mod_tags[modHash] || [];
-  });
+  const tags = $derived<string[]>(modHash ? (appState.userData.mod_tags[modHash] || []) : []);
 
   function handleAddTag() {
     if (!newTagInput.trim() || !modHash) return;
-    const current = [...tags()];
+    const current = [...tags];
     if (!current.includes(newTagInput.trim())) {
       current.push(newTagInput.trim());
       appState.setModTagsFor(modHash, current);
@@ -41,7 +38,7 @@
 
   function handleRemoveTag(tagToRemove: string) {
     if (!modHash) return;
-    const current = tags().filter((t) => t !== tagToRemove);
+    const current = tags.filter((t: string) => t !== tagToRemove);
     appState.setModTagsFor(modHash, current);
   }
 
@@ -205,7 +202,7 @@
         </div>
 
         <div class="flex flex-wrap gap-1.5">
-          {#each tags() as tag}
+          {#each tags as tag}
             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700 text-[11px]">
               <span>{tag}</span>
               <button
