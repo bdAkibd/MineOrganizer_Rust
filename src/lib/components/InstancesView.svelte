@@ -1,6 +1,6 @@
 <script lang="ts">
   import { appState } from '$lib/store.svelte';
-  import { t } from '$lib/i18n';
+  import { t } from '$lib/i18n.svelte';
   import { discoverInstanceEnvironments } from '$lib/api';
   import type { Instance } from '$lib/types';
   import {

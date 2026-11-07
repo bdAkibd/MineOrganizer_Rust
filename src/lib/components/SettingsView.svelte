@@ -1,6 +1,6 @@
 <script lang="ts">
   import { appState } from '$lib/store.svelte';
-  import { i18n, LOCALE_NAMES, SUPPORTED_LOCALES, t } from '$lib/i18n';
+  import { i18n, LOCALE_NAMES, SUPPORTED_LOCALES, t } from '$lib/i18n.svelte';
   import {
     Settings,
     Globe,

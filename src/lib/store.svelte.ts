@@ -1,5 +1,5 @@
 import * as api from './api';
-import { i18n } from './i18n';
+import { i18n } from './i18n.svelte';
 import type {
   AppSettings,
   Instance,
