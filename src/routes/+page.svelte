@@ -11,11 +11,14 @@
   import ModDetailDrawer from '$lib/components/ModDetailDrawer.svelte';
   import VirtualizationModal from '$lib/components/VirtualizationModal.svelte';
   import ToastContainer from '$lib/components/ToastContainer.svelte';
+  import ContextMenu from '$lib/components/ContextMenu.svelte';
 
   $effect(() => {
     appState.init();
   });
 </script>
+
+<svelte:window oncontextmenu={(e) => e.preventDefault()} />
 
 <div class="flex h-screen w-screen overflow-hidden bg-[#09090b] text-zinc-100 font-sans select-none antialiased">
   <!-- Left Navigation Rail (Vortex Style) -->
@@ -51,5 +54,8 @@
 
     <!-- Notification Toasts -->
     <ToastContainer />
+
+    <!-- Custom Right-Click Context Menu -->
+    <ContextMenu />
   </div>
 </div>

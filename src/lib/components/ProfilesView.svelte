@@ -17,12 +17,62 @@
     Folder,
     FolderOpen,
     ExternalLink,
+    SlidersHorizontal,
   } from '@lucide/svelte';
+  import { contextMenu } from '$lib/contextMenu.svelte';
+  import ProfileModSelectorModal from '$lib/components/ProfileModSelectorModal.svelte';
 
   let newProfileModalOpen = $state(false);
   let newProfileName = $state('');
   let selectedInstanceId = $state<string>('');
   let storageDir = $state<string>('');
+  let editingProfile = $state<Profile | null>(null);
+
+  function handleProfileContextMenu(e: MouseEvent, prof: Profile) {
+    const isActive = prof.id === appState.activeProfile?.id;
+    contextMenu.open(e, [
+      {
+        label: 'Select / Configure Mods',
+        icon: SlidersHorizontal,
+        action: () => (editingProfile = prof),
+      },
+      ...(!isActive
+        ? [
+            {
+              label: 'Make Active',
+              icon: Check,
+              action: () => appState.setActiveProfile(prof.id),
+            },
+          ]
+        : []),
+      {
+        label: 'Deploy to Game',
+        icon: Play,
+        action: () => handleDeploy(prof),
+      },
+      {
+        label: 'Export as Modpack (.morgpack)',
+        icon: Download,
+        action: () => handleExportPack(prof),
+      },
+      ...(prof.instance_path
+        ? [
+            {
+              label: 'Open Target Directory',
+              icon: FolderOpen,
+              action: () => openPathInExplorer(prof.instance_path!),
+            },
+          ]
+        : []),
+      { separator: true, label: '', action: () => {} },
+      {
+        label: 'Delete Profile',
+        icon: Trash2,
+        danger: true,
+        action: () => appState.deleteProfile(prof.id),
+      },
+    ]);
+  }
 
   $effect(() => {
     getAppDataDir().then((dir) => {
@@ -155,6 +205,7 @@
             role="button"
             tabindex="0"
             onclick={() => appState.setActiveProfile(prof.id)}
+            oncontextmenu={(e) => handleProfileContextMenu(e, prof)}
             onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && appState.setActiveProfile(prof.id)}
             class="p-5 rounded-xl bg-zinc-900/60 border transition-all flex flex-col justify-between cursor-pointer select-none group {isActive
               ? 'border-violet-500/60 bg-violet-950/15 shadow-xl shadow-violet-950/30'
@@ -225,6 +276,18 @@
                 >
                   <Play class="w-3.5 h-3.5 fill-current" />
                   <span>{t('Deploy')}</span>
+                </button>
+
+                <button
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    editingProfile = prof;
+                  }}
+                  title={t('Select / Configure Mods')}
+                  class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-violet-300 hover:text-white bg-violet-500/10 hover:bg-violet-600/30 border border-violet-500/30 transition-colors"
+                >
+                  <SlidersHorizontal class="w-3.5 h-3.5" />
+                  <span>{t('Mods')}</span>
                 </button>
 
                 <button
@@ -304,4 +367,12 @@
       </div>
     </div>
   </div>
+{/if}
+
+<!-- Modal: Select / Configure Mods for Profile -->
+{#if editingProfile}
+  <ProfileModSelectorModal
+    profile={editingProfile}
+    onclose={() => (editingProfile = null)}
+  />
 {/if}

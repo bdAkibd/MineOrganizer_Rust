@@ -80,6 +80,32 @@ export async function checkModCompatibility(
   });
 }
 
+export async function importFilesToLibrary(
+  sourcePaths: string[],
+  libraryDir: string
+): Promise<string[]> {
+  return invoke<string[]>('import_files_to_library_cmd', {
+    sourcePaths,
+    libraryDir,
+  });
+}
+
+export async function saveBinaryToLibrary(
+  fileName: string,
+  bytes: number[] | Uint8Array,
+  libraryDir: string
+): Promise<string[]> {
+  return invoke<string[]>('save_binary_to_library_cmd', {
+    fileName,
+    bytes: Array.from(bytes),
+    libraryDir,
+  });
+}
+
+export async function deleteModFile(filePath: string): Promise<boolean> {
+  return invoke<boolean>('delete_mod_file_cmd', { filePath });
+}
+
 // ============================================================================
 // Virtualization
 // ============================================================================

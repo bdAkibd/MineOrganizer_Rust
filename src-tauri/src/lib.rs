@@ -9,7 +9,10 @@ use commands::instances::{
     discover_instance_environments, get_default_candidate_paths, get_default_prism_path,
     scan_all_instances, scan_single_directory,
 };
-use commands::library::{check_mod_compatibility_cmd, parse_single_mod, scan_library_mods};
+use commands::library::{
+    check_mod_compatibility_cmd, delete_mod_file_cmd, import_files_to_library_cmd,
+    parse_single_mod, save_binary_to_library_cmd, scan_library_mods,
+};
 use commands::modpacks::{export_modpack_cmd, import_modpack_cmd, inspect_modpack_cmd};
 use commands::modrinth::{
     check_mod_updates_cmd, download_modrinth_file_cmd, get_project_versions_cmd,
@@ -42,6 +45,9 @@ pub fn run() {
             scan_library_mods,
             parse_single_mod,
             check_mod_compatibility_cmd,
+            import_files_to_library_cmd,
+            save_binary_to_library_cmd,
+            delete_mod_file_cmd,
             // Virtualization
             preview_profile_cmd,
             apply_profile_cmd,

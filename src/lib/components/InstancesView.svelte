@@ -12,9 +12,47 @@
     FolderOpen,
     Sparkles,
     RefreshCw,
+    FolderHeart,
+    FileText,
   } from '@lucide/svelte';
+  import { contextMenu } from '$lib/contextMenu.svelte';
+  import { openPathInExplorer } from '$lib/api';
 
   let customPathInput = $state('');
+
+  function handleInstanceContextMenu(e: MouseEvent, inst: Instance) {
+    contextMenu.open(e, [
+      {
+        label: 'Link to Active Profile',
+        icon: Check,
+        action: () => handleSelectForProfile(inst),
+      },
+      {
+        label: 'Create Profile for this Environment',
+        icon: FolderHeart,
+        action: () => {
+          appState.createNewProfile(inst.name, inst);
+          appState.activeTab = 'profiles';
+        },
+      },
+      {
+        label: 'Open Folder in Explorer',
+        icon: FolderOpen,
+        action: () => openPathInExplorer(inst.path),
+      },
+      {
+        label: 'View Diagnostics & Logs',
+        icon: FileText,
+        action: () => handleOpenDiagnostics(inst),
+      },
+      { separator: true, label: '', action: () => {} },
+      {
+        label: 'Rescan Environments',
+        icon: RefreshCw,
+        action: () => appState.refreshInstances(),
+      },
+    ]);
+  }
 
   async function handleAddCustomPath() {
     if (!customPathInput.trim()) return;
@@ -97,9 +135,14 @@
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
       {#each appState.instances as inst}
         {@const isActiveForProfile = appState.activeProfile?.instance_path === inst.path}
-        <div class="p-4 rounded-xl bg-zinc-900/60 border transition-all duration-150 flex flex-col justify-between {isActiveForProfile
-          ? 'border-violet-500/60 bg-violet-950/10 shadow-lg shadow-violet-950/20'
-          : 'border-[#27272a] hover:border-zinc-700 hover:bg-zinc-900'}">
+        <div
+          role="region"
+          aria-label={inst.name}
+          oncontextmenu={(e) => handleInstanceContextMenu(e, inst)}
+          class="p-4 rounded-xl bg-zinc-900/60 border transition-all duration-150 flex flex-col justify-between {isActiveForProfile
+            ? 'border-violet-500/60 bg-violet-950/10 shadow-lg shadow-violet-950/20'
+            : 'border-[#27272a] hover:border-zinc-700 hover:bg-zinc-900'}"
+        >
           <div class="space-y-3">
             <!-- Launcher Tag & Status -->
             <div class="flex items-center justify-between">

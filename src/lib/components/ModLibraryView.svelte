@@ -14,9 +14,171 @@
     ChevronRight,
     HelpCircle,
     FileBox,
+    Plus,
+    Upload,
+    FolderOpen,
+    Trash2,
+    Copy,
+    Layers,
+    Check,
+    X,
   } from '@lucide/svelte';
+  import { contextMenu } from '$lib/contextMenu.svelte';
+  import {
+    deleteModFile,
+    importFilesToLibrary,
+    openPathInExplorer,
+    saveBinaryToLibrary,
+  } from '$lib/api';
 
   const loaders = ['all', 'Fabric', 'Forge', 'NeoForge', 'Quilt'];
+  let fileInputRef = $state<HTMLInputElement | null>(null);
+  let isDraggingOver = $state(false);
+
+  $effect(() => {
+    let unlisten: (() => void) | undefined;
+    (async () => {
+      try {
+        const { getCurrentWebview } = await import('@tauri-apps/api/webview');
+        unlisten = await getCurrentWebview().onDragDropEvent((event) => {
+          if (event.payload.type === 'enter' || event.payload.type === 'over') {
+            isDraggingOver = true;
+          } else if (event.payload.type === 'leave') {
+            isDraggingOver = false;
+          } else if (event.payload.type === 'drop') {
+            isDraggingOver = false;
+            if (event.payload.paths && event.payload.paths.length > 0) {
+              handleImportPaths(event.payload.paths);
+            }
+          }
+        });
+      } catch (e) {
+        // Fallback for non-tauri or browser dev
+      }
+    })();
+
+    return () => {
+      if (unlisten) unlisten();
+    };
+  });
+
+  async function handleImportPaths(paths: string[]) {
+    const libDir = appState.userData.settings.library_dir || './mods_library';
+    appState.isLoading = true;
+    try {
+      const imported = await importFilesToLibrary(paths, libDir);
+      await appState.refreshLibraryMods();
+      appState.showToast(`Imported ${imported.length} file(s) to library`, 'success');
+    } catch (e: any) {
+      appState.showToast(`Import failed: ${e?.message || e}`, 'error');
+    } finally {
+      appState.isLoading = false;
+    }
+  }
+
+  async function handleFileInputChange(e: Event) {
+    const input = e.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const libDir = appState.userData.settings.library_dir || './mods_library';
+    appState.isLoading = true;
+    let count = 0;
+
+    try {
+      for (const file of Array.from(input.files)) {
+        const buffer = await file.arrayBuffer();
+        const res = await saveBinaryToLibrary(file.name, new Uint8Array(buffer), libDir);
+        count += res.length;
+      }
+      await appState.refreshLibraryMods();
+      appState.showToast(`Imported ${count} file(s) to library`, 'success');
+    } catch (e: any) {
+      appState.showToast(`Import failed: ${e?.message || e}`, 'error');
+    } finally {
+      appState.isLoading = false;
+      input.value = '';
+    }
+  }
+
+  async function handleHtmlDrop(e: DragEvent) {
+    e.preventDefault();
+    isDraggingOver = false;
+    if (!e.dataTransfer?.files || e.dataTransfer.files.length === 0) return;
+
+    const libDir = appState.userData.settings.library_dir || './mods_library';
+    appState.isLoading = true;
+    let count = 0;
+
+    try {
+      for (const file of Array.from(e.dataTransfer.files)) {
+        const buffer = await file.arrayBuffer();
+        const res = await saveBinaryToLibrary(file.name, new Uint8Array(buffer), libDir);
+        count += res.length;
+      }
+      await appState.refreshLibraryMods();
+      appState.showToast(`Imported ${count} file(s) to library`, 'success');
+    } catch (e: any) {
+      appState.showToast(`Import failed: ${e?.message || e}`, 'error');
+    } finally {
+      appState.isLoading = false;
+    }
+  }
+
+  function handleModContextMenu(e: MouseEvent, mod: ModFile) {
+    const isActive = appState.isModActiveInProfile(mod);
+    const hash = mod.sha256 || mod.sha1;
+
+    contextMenu.open(e, [
+      {
+        label: isActive ? 'Disable in Active Profile' : 'Enable in Active Profile',
+        icon: isActive ? X : Check,
+        action: () => appState.toggleModInActiveProfile(hash),
+      },
+      {
+        label: 'View Mod Details',
+        icon: Layers,
+        action: () => (appState.selectedMod = mod),
+      },
+      {
+        label: 'Open File in Explorer',
+        icon: FolderOpen,
+        action: () => {
+          openPathInExplorer(mod.path);
+        },
+      },
+      {
+        label: 'Copy Mod Name',
+        icon: Copy,
+        action: () => {
+          navigator.clipboard.writeText(mod.metadata.name || mod.file_name);
+          appState.showToast('Copied mod name to clipboard', 'info');
+        },
+      },
+      {
+        label: 'Copy SHA256 Hash',
+        icon: Copy,
+        action: () => {
+          navigator.clipboard.writeText(hash);
+          appState.showToast('Copied hash to clipboard', 'info');
+        },
+      },
+      { separator: true, label: '', action: () => {} },
+      {
+        label: 'Delete from Library',
+        icon: Trash2,
+        danger: true,
+        action: async () => {
+          try {
+            await deleteModFile(mod.path);
+            await appState.refreshLibraryMods();
+            appState.showToast(`Deleted "${mod.file_name}"`, 'success');
+          } catch (err: any) {
+            appState.showToast(`Failed to delete: ${err?.message || err}`, 'error');
+          }
+        },
+      },
+    ]);
+  }
 
   function formatBytes(bytes: number): string {
     if (bytes === 0) return '0 B';
@@ -51,11 +213,50 @@
   }
 </script>
 
-<div class="flex-1 flex flex-col h-full bg-[#09090b] overflow-hidden">
+<div
+  role="region"
+  aria-label="Mod Library"
+  class="flex-1 flex flex-col h-full bg-[#09090b] overflow-hidden relative"
+  ondragover={(e) => {
+    e.preventDefault();
+    isDraggingOver = true;
+  }}
+  ondragleave={() => (isDraggingOver = false)}
+  ondrop={handleHtmlDrop}
+>
+  <!-- Drag and drop overlay -->
+  {#if isDraggingOver}
+    <div class="absolute inset-0 z-40 bg-violet-950/80 backdrop-blur-xs border-2 border-dashed border-violet-400 rounded-xl flex flex-col items-center justify-center pointer-events-none p-6 text-center animate-in fade-in duration-150">
+      <div class="w-16 h-16 rounded-2xl bg-violet-600/30 border border-violet-400 flex items-center justify-center text-violet-300 mb-4 shadow-xl">
+        <Upload class="w-8 h-8 animate-bounce" />
+      </div>
+      <h3 class="text-base font-bold text-white mb-1">{t('Drop files to import into Library')}</h3>
+      <p class="text-xs text-violet-200">{t('Supports .jar mods, .zip archives, and .mrpack / .morgpack packages')}</p>
+    </div>
+  {/if}
+
   <!-- Filter Toolbar -->
   <div class="px-6 py-3 border-b border-[#27272a]/60 bg-[#0c0d10]/40 flex flex-wrap items-center justify-between gap-3 shrink-0">
     <!-- Filter pills -->
     <div class="flex flex-wrap items-center gap-2">
+      <!-- Import / Add Files Button -->
+      <button
+        onclick={() => fileInputRef?.click()}
+        class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold transition-all shadow-md shadow-violet-950/40"
+      >
+        <Plus class="w-3.5 h-3.5" />
+        <span>{t('Import Mods')}</span>
+      </button>
+
+      <input
+        type="file"
+        multiple
+        accept=".jar,.zip,.mrpack,.morgpack"
+        class="hidden"
+        bind:this={fileInputRef}
+        onchange={handleFileInputChange}
+      />
+
       <!-- Loader filter -->
       <div class="flex items-center bg-zinc-900 border border-zinc-700/60 rounded-lg p-0.5 text-xs">
         {#each loaders as ldr}
@@ -118,16 +319,22 @@
         <p class="text-xs text-zinc-500 max-w-sm mb-4">
           {appState.searchQuery || appState.selectedLoader !== 'all'
             ? t('Try adjusting your search or filters.')
-            : t('Add mods to your library folder or install from the Modrinth browser.')}
+            : t('Drop .jar files here, click "Import Mods", or install from Modrinth.')}
         </p>
-        {#if !appState.searchQuery && appState.selectedLoader === 'all'}
+        <div class="flex items-center gap-3">
+          <button
+            onclick={() => fileInputRef?.click()}
+            class="px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs font-semibold text-white transition-all"
+          >
+            {t('Import Mods')}
+          </button>
           <button
             onclick={() => (appState.activeTab = 'modrinth')}
             class="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-xs font-semibold text-white transition-all shadow-md shadow-violet-900/40"
           >
             {t('Browse Modrinth')}
           </button>
-        {/if}
+        </div>
       </div>
     {:else}
       <table class="w-full text-left border-collapse text-xs">
@@ -151,6 +358,7 @@
 
             <tr
               onclick={() => (appState.selectedMod = mod)}
+              oncontextmenu={(e) => handleModContextMenu(e, mod)}
               class="group hover:bg-zinc-800/40 cursor-pointer transition-colors {isSelected ? 'bg-violet-950/20 hover:bg-violet-950/30' : ''}"
             >
               <!-- Enable / Disable Toggle -->
