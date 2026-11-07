@@ -537,5 +537,16 @@
   "Planned Operations": "計劃的操作",
   "Changes are recorded and can be undone at any time.": "變更已被記錄，可隨時復原。",
   "Applying...": "正在套用...",
-  "Confirm & Deploy": "確認並部署"
+  "Confirm & Deploy": "確認並部署",
+  "Release": "正式版",
+  "Beta": "測試版",
+  "Alpha": "內測版",
+  "Snapshot": "快照版",
+  "Filter versions (e.g. 1.20, beta, snapshot)...": "篩選版本（例如 1.20、測試版、快照版）...",
+  "Releases": "正式版",
+  "Snapshots": "快照版",
+  "No filter": "無篩選",
+  "No versions found": "未找到版本",
+  "versions": "個版本",
+  "Reset filter": "重設篩選"
 }

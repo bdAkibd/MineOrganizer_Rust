@@ -7,6 +7,7 @@
     searchModrinth,
   } from '$lib/api';
   import type { ModrinthSearchResult, ModrinthVersion } from '$lib/types';
+  import MinecraftVersionSelect from '$lib/components/MinecraftVersionSelect.svelte';
   import {
     Search,
     Store,
@@ -158,12 +159,9 @@
         <option value="quilt">Quilt</option>
       </select>
 
-      <input
-        type="text"
-        placeholder={t('Minecraft Version')}
+      <MinecraftVersionSelect
         bind:value={versionFilter}
-        onkeydown={(e) => e.key === 'Enter' && handleSearch(1)}
-        class="w-28 px-3 py-2 bg-zinc-900 border border-zinc-700 text-xs text-zinc-300 rounded-lg focus:outline-none focus:border-violet-500 font-mono"
+        onchange={() => handleSearch(1)}
       />
     </div>
   </div>

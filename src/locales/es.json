@@ -537,5 +537,16 @@
   "Planned Operations": "Operaciones planificadas",
   "Changes are recorded and can be undone at any time.": "Los cambios se registran y se pueden deshacer en cualquier momento.",
   "Applying...": "Aplicando...",
-  "Confirm & Deploy": "Confirmar y desplegar"
+  "Confirm & Deploy": "Confirmar y desplegar",
+  "Release": "Versión final",
+  "Beta": "Beta",
+  "Alpha": "Alfa",
+  "Snapshot": "Instantánea",
+  "Filter versions (e.g. 1.20, beta, snapshot)...": "Filtrar versiones (ej. 1.20, beta, instantánea)...",
+  "Releases": "Versiones finales",
+  "Snapshots": "Instantáneas",
+  "No filter": "Sin filtro",
+  "No versions found": "No se encontraron versiones",
+  "versions": "versiones",
+  "Reset filter": "Restablecer filtro"
 }

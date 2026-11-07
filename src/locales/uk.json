@@ -537,5 +537,16 @@
   "Planned Operations": "Заплановані операції",
   "Changes are recorded and can be undone at any time.": "Зміни записуються і можуть бути скасовані в будь-який момент.",
   "Applying...": "Застосування...",
-  "Confirm & Deploy": "Підтвердити та застосувати"
+  "Confirm & Deploy": "Підтвердити та застосувати",
+  "Release": "Реліз",
+  "Beta": "Бета",
+  "Alpha": "Альфа",
+  "Snapshot": "Снапшот",
+  "Filter versions (e.g. 1.20, beta, snapshot)...": "Фільтр версій (напр. 1.20, бета, снапшот)...",
+  "Releases": "Релізи",
+  "Snapshots": "Снапшоти",
+  "No filter": "Без фільтра",
+  "No versions found": "Версії не знайдено",
+  "versions": "версій",
+  "Reset filter": "Скинути фільтр"
 }

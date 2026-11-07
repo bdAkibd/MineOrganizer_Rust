@@ -537,5 +537,16 @@
   "Planned Operations": "計画された操作",
   "Changes are recorded and can be undone at any time.": "変更は記録され、いつでも元に戻すことができます。",
   "Applying...": "適用中...",
-  "Confirm & Deploy": "確認して適用"
+  "Confirm & Deploy": "確認して適用",
+  "Release": "リリース",
+  "Beta": "ベータ",
+  "Alpha": "アルファ",
+  "Snapshot": "スナップショット",
+  "Filter versions (e.g. 1.20, beta, snapshot)...": "バージョンを絞り込み（例: 1.20, beta, snapshot）...",
+  "Releases": "リリース",
+  "Snapshots": "スナップショット",
+  "No filter": "フィルターなし",
+  "No versions found": "バージョンが見つかりません",
+  "versions": "バージョン",
+  "Reset filter": "フィルターをリセット"
 }

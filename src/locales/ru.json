@@ -537,5 +537,16 @@
   "Planned Operations": "Запланированные операции",
   "Changes are recorded and can be undone at any time.": "Изменения записываются и могут быть отменены в любой момент.",
   "Applying...": "Применение...",
-  "Confirm & Deploy": "Подтвердить и применить"
+  "Confirm & Deploy": "Подтвердить и применить",
+  "Release": "Релиз",
+  "Beta": "Бета",
+  "Alpha": "Альфа",
+  "Snapshot": "Снапшот",
+  "Filter versions (e.g. 1.20, beta, snapshot)...": "Фильтр версий (напр. 1.20, бета, снапшот)...",
+  "Releases": "Релизы",
+  "Snapshots": "Снапшоты",
+  "No filter": "Без фильтра",
+  "No versions found": "Версии не найдены",
+  "versions": "версий",
+  "Reset filter": "Сбросить фильтр"
 }
