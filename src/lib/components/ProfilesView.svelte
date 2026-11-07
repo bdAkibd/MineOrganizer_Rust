@@ -21,12 +21,14 @@
   } from '@lucide/svelte';
   import { contextMenu } from '$lib/contextMenu.svelte';
   import ProfileModSelectorModal from '$lib/components/ProfileModSelectorModal.svelte';
+  import ExportModpackModal from '$lib/components/ExportModpackModal.svelte';
 
   let newProfileModalOpen = $state(false);
   let newProfileName = $state('');
   let selectedInstanceId = $state<string>('');
   let storageDir = $state<string>('');
   let editingProfile = $state<Profile | null>(null);
+  let exportingProfile = $state<Profile | null>(null);
 
   function handleProfileContextMenu(e: MouseEvent, prof: Profile) {
     const isActive = prof.id === appState.activeProfile?.id;
@@ -53,7 +55,7 @@
       {
         label: 'Export as Modpack (.morgpack)',
         icon: Download,
-        action: () => handleExportPack(prof),
+        action: () => (exportingProfile = prof),
       },
       ...(prof.instance_path
         ? [
@@ -293,7 +295,7 @@
                 <button
                   onclick={(e) => {
                     e.stopPropagation();
-                    handleExportPack(prof);
+                    exportingProfile = prof;
                   }}
                   title={t('Export as modpack')}
                   class="p-2 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 border border-zinc-700/60 transition-colors"
@@ -374,5 +376,13 @@
   <ProfileModSelectorModal
     profile={editingProfile}
     onclose={() => (editingProfile = null)}
+  />
+{/if}
+
+<!-- Modal: Export Modpack with Assets -->
+{#if exportingProfile}
+  <ExportModpackModal
+    profile={exportingProfile}
+    onclose={() => (exportingProfile = null)}
   />
 {/if}

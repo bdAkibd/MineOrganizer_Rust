@@ -180,6 +180,26 @@ export interface ModUpdateInfo {
   changelog: string;
 }
 
+export interface AssetItem {
+  name: string;
+  filename: string;
+  path: string;
+  size: number;
+}
+
+export interface SaveItem {
+  folder_name: string;
+  level_name: string;
+  path: string;
+  size: number;
+}
+
+export interface InstanceAssets {
+  resourcepacks: AssetItem[];
+  shaderpacks: AssetItem[];
+  saves: SaveItem[];
+}
+
 export interface ModpackInspectResult {
   name: string;
   minecraft_version: string;

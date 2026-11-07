@@ -13,7 +13,9 @@ use commands::library::{
     check_mod_compatibility_cmd, delete_mod_file_cmd, import_files_to_library_cmd,
     parse_single_mod, save_binary_to_library_cmd, scan_library_mods,
 };
-use commands::modpacks::{export_modpack_cmd, import_modpack_cmd, inspect_modpack_cmd};
+use commands::modpacks::{
+    export_modpack_cmd, import_modpack_cmd, inspect_modpack_cmd, list_instance_assets_cmd,
+};
 use commands::modrinth::{
     check_mod_updates_cmd, download_modrinth_file_cmd, get_project_versions_cmd,
     search_modrinth_cmd,
@@ -62,10 +64,11 @@ pub fn run() {
             get_project_versions_cmd,
             download_modrinth_file_cmd,
             check_mod_updates_cmd,
-            // Modpacks
+            // Modpacks & Assets
             inspect_modpack_cmd,
             export_modpack_cmd,
             import_modpack_cmd,
+            list_instance_assets_cmd,
             // Profiles & Storage
             load_user_data_cmd,
             save_profile_cmd,

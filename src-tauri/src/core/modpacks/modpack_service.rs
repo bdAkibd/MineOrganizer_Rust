@@ -339,10 +339,19 @@ pub fn export_profile_to_modpack(
     }
 
     // 4. Configs (if instance_path is known and include_configs is true)
+    let mc_dir = profile.instance_path.as_ref().map(|p| {
+        let p_path = Path::new(p);
+        if p_path.join(".minecraft").is_dir() {
+            p_path.join(".minecraft")
+        } else {
+            p_path.to_path_buf()
+        }
+    });
+
     let mut configs_written = 0;
     if options.include_configs {
-        if let Some(ref inst_path_str) = profile.instance_path {
-            let config_dir = Path::new(inst_path_str).join("config");
+        if let Some(ref mcd) = mc_dir {
+            let config_dir = mcd.join("config");
             if config_dir.is_dir() {
                 for entry in walkdir::WalkDir::new(&config_dir).into_iter().filter_map(|e| e.ok()) {
                     if entry.file_type().is_file() {
@@ -365,6 +374,108 @@ pub fn export_profile_to_modpack(
         }
     }
 
+    // 5. Resourcepacks
+    let mut resourcepacks_written = 0;
+    if options.include_resourcepacks {
+        if let Some(ref mcd) = mc_dir {
+            let rp_dir = mcd.join("resourcepacks");
+            if rp_dir.is_dir() {
+                for entry in walkdir::WalkDir::new(&rp_dir).into_iter().filter_map(|e| e.ok()) {
+                    if entry.file_type().is_file() {
+                        if let Ok(rel) = entry.path().strip_prefix(&rp_dir) {
+                            let rel_str = rel.to_string_lossy().replace('\\', "/");
+                            let arc_name = format!("resourcepacks/{}", rel_str);
+                            if zip.start_file(arc_name, zip_options).is_ok() {
+                                if let Ok(mut src) = File::open(entry.path()) {
+                                    let mut buf = Vec::new();
+                                    if src.read_to_end(&mut buf).is_ok() {
+                                        let _ = zip.write_all(&buf);
+                                        if rel.components().count() == 1 {
+                                            resourcepacks_written += 1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 6. Shaderpacks
+    let mut shaderpacks_written = 0;
+    if options.include_shaderpacks {
+        if let Some(ref mcd) = mc_dir {
+            let sp_dir = mcd.join("shaderpacks");
+            if sp_dir.is_dir() {
+                for entry in walkdir::WalkDir::new(&sp_dir).into_iter().filter_map(|e| e.ok()) {
+                    if entry.file_type().is_file() {
+                        if let Ok(rel) = entry.path().strip_prefix(&sp_dir) {
+                            let rel_str = rel.to_string_lossy().replace('\\', "/");
+                            let arc_name = format!("shaderpacks/{}", rel_str);
+                            if zip.start_file(arc_name, zip_options).is_ok() {
+                                if let Ok(mut src) = File::open(entry.path()) {
+                                    let mut buf = Vec::new();
+                                    if src.read_to_end(&mut buf).is_ok() {
+                                        let _ = zip.write_all(&buf);
+                                        if rel.components().count() == 1 {
+                                            shaderpacks_written += 1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 7. Saves / Worlds
+    let mut saves_written = 0;
+    if options.include_saves {
+        if let Some(ref mcd) = mc_dir {
+            let saves_dir = mcd.join("saves");
+            if saves_dir.is_dir() {
+                if let Ok(entries) = fs::read_dir(&saves_dir) {
+                    for entry in entries.filter_map(|e| e.ok()) {
+                        let path = entry.path();
+                        if path.is_dir() {
+                            let folder_name = entry.file_name().to_string_lossy().to_string();
+                            if let Some(ref sel) = options.selected_saves {
+                                if !sel.is_empty() && !sel.contains(&folder_name) {
+                                    continue;
+                                }
+                            }
+                            let mut world_files_count = 0;
+                            for world_entry in walkdir::WalkDir::new(&path).into_iter().filter_map(|e| e.ok()) {
+                                if world_entry.file_type().is_file() {
+                                    if let Ok(rel) = world_entry.path().strip_prefix(&path) {
+                                        let rel_str = rel.to_string_lossy().replace('\\', "/");
+                                        let arc_name = format!("saves/{}/{}", folder_name, rel_str);
+                                        if zip.start_file(arc_name, zip_options).is_ok() {
+                                            if let Ok(mut src) = File::open(world_entry.path()) {
+                                                let mut buf = Vec::new();
+                                                if src.read_to_end(&mut buf).is_ok() {
+                                                    let _ = zip.write_all(&buf);
+                                                    world_files_count += 1;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if world_files_count > 0 {
+                                saves_written += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     zip.finish().map_err(|e| format!("Failed to finalize zip: {}", e))?;
 
     let archive_size = fs::metadata(output_archive).map(|m| m.len()).unwrap_or(0);
@@ -372,9 +483,9 @@ pub fn export_profile_to_modpack(
     Ok(ModpackExportReport {
         mods_count: mods_written,
         configs_count: configs_written,
-        resourcepacks_count: 0,
-        shaderpacks_count: 0,
-        saves_count: 0,
+        resourcepacks_count: resourcepacks_written,
+        shaderpacks_count: shaderpacks_written,
+        saves_count: saves_written,
         archive_size,
         output_path: output_archive.to_path_buf(),
     })
@@ -393,9 +504,21 @@ pub async fn import_modpack(
     let file = File::open(archive_path).map_err(|e| format!("Failed to open archive: {}", e))?;
     let mut arc = ZipArchive::new(file).map_err(|e| format!("Failed to read zip: {}", e))?;
 
+    let target_mc_dir = target_instance_path.map(|p| {
+        if p.join(".minecraft").is_dir() {
+            p.join(".minecraft")
+        } else {
+            p.to_path_buf()
+        }
+    });
+
     let mut imported_mod_hashes = Vec::new();
     let mut imported_mods_count = 0;
     let mut imported_configs_count = 0;
+    let mut imported_resourcepacks_count = 0;
+    let mut imported_shaderpacks_count = 0;
+    let mut imported_saves_count = 0;
+    let mut seen_saves: HashSet<String> = HashSet::new();
 
     // Handle Modrinth (.mrpack) index download if remote files are defined
     if inspect.format == "modrinth" {
@@ -486,6 +609,89 @@ pub async fn import_modpack(
                 }
             }
         }
+        // Extract resourcepacks to target instance
+        else if (entry_name.starts_with("resourcepacks/") || entry_name.starts_with("overrides/resourcepacks/")) && !entry.is_dir() {
+            if let Some(ref mcd) = target_mc_dir {
+                let rel = if entry_name.starts_with("resourcepacks/") {
+                    &entry_name["resourcepacks/".len()..]
+                } else {
+                    &entry_name["overrides/resourcepacks/".len()..]
+                };
+                let target_dir = mcd.join("resourcepacks");
+                if is_safe_relative_path(&target_dir, rel) {
+                    let dest = target_dir.join(rel);
+                    if let Some(parent) = dest.parent() {
+                        let _ = fs::create_dir_all(parent);
+                    }
+                    if let Ok(mut out) = File::create(&dest) {
+                        let mut buf = Vec::new();
+                        if entry.read_to_end(&mut buf).is_ok() {
+                            let _ = out.write_all(&buf);
+                            if Path::new(rel).components().count() == 1 {
+                                imported_resourcepacks_count += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Extract shaderpacks to target instance
+        else if (entry_name.starts_with("shaderpacks/") || entry_name.starts_with("overrides/shaderpacks/")) && !entry.is_dir() {
+            if let Some(ref mcd) = target_mc_dir {
+                let rel = if entry_name.starts_with("shaderpacks/") {
+                    &entry_name["shaderpacks/".len()..]
+                } else {
+                    &entry_name["overrides/shaderpacks/".len()..]
+                };
+                let target_dir = mcd.join("shaderpacks");
+                if is_safe_relative_path(&target_dir, rel) {
+                    let dest = target_dir.join(rel);
+                    if let Some(parent) = dest.parent() {
+                        let _ = fs::create_dir_all(parent);
+                    }
+                    if let Ok(mut out) = File::create(&dest) {
+                        let mut buf = Vec::new();
+                        if entry.read_to_end(&mut buf).is_ok() {
+                            let _ = out.write_all(&buf);
+                            if Path::new(rel).components().count() == 1 {
+                                imported_shaderpacks_count += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Extract saves to target instance
+        else if (entry_name.starts_with("saves/") || entry_name.starts_with("overrides/saves/")) && !entry.is_dir() {
+            if let Some(ref mcd) = target_mc_dir {
+                let rel = if entry_name.starts_with("saves/") {
+                    &entry_name["saves/".len()..]
+                } else {
+                    &entry_name["overrides/saves/".len()..]
+                };
+                let target_dir = mcd.join("saves");
+                if is_safe_relative_path(&target_dir, rel) {
+                    let dest = target_dir.join(rel);
+                    if let Some(parent) = dest.parent() {
+                        let _ = fs::create_dir_all(parent);
+                    }
+                    if let Ok(mut out) = File::create(&dest) {
+                        let mut buf = Vec::new();
+                        if entry.read_to_end(&mut buf).is_ok() {
+                            let _ = out.write_all(&buf);
+                            let folder_name = Path::new(rel)
+                                .components()
+                                .next()
+                                .map(|c| c.as_os_str().to_string_lossy().to_string())
+                                .unwrap_or_default();
+                            if !folder_name.is_empty() && seen_saves.insert(folder_name) {
+                                imported_saves_count += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     imported_mod_hashes.sort();
@@ -499,9 +705,9 @@ pub async fn import_modpack(
         loader_version: inspect.loader_version,
         imported_mods_count,
         imported_configs_count,
-        imported_resourcepacks_count: 0,
-        imported_shaderpacks_count: 0,
-        imported_saves_count: 0,
+        imported_resourcepacks_count,
+        imported_shaderpacks_count,
+        imported_saves_count,
         imported_mod_hashes,
     })
 }

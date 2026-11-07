@@ -14,3 +14,26 @@ pub struct Instance {
     #[serde(default)]
     pub icon: Option<String>,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct InstanceAssets {
+    pub resourcepacks: Vec<AssetItem>,
+    pub shaderpacks: Vec<AssetItem>,
+    pub saves: Vec<SaveItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct AssetItem {
+    pub name: String,
+    pub filename: String,
+    pub path: String,
+    pub size: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct SaveItem {
+    pub folder_name: String,
+    pub level_name: String,
+    pub path: String,
+    pub size: u64,
+}

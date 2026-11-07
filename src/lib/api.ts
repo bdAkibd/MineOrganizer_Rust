@@ -3,6 +3,7 @@ import type {
   AppSettings,
   CrashAnalysis,
   Instance,
+  InstanceAssets,
   ModFile,
   ModMetadata,
   ModpackExportReport,
@@ -13,6 +14,8 @@ import type {
   ModrinthVersion,
   ModUpdateInfo,
   Profile,
+  SaveItem,
+  AssetItem,
   UserDataStore,
   VirtualizationPlan,
   VirtualizationResult,
@@ -268,7 +271,8 @@ export async function exportModpack(
   includeConfigs: boolean = true,
   includeResourcepacks: boolean = true,
   includeShaderpacks: boolean = true,
-  includeSaves: boolean = false
+  includeSaves: boolean = false,
+  selectedSaves?: string[] | null
 ): Promise<ModpackExportReport> {
   return invoke<ModpackExportReport>('export_modpack_cmd', {
     profileId,
@@ -278,7 +282,12 @@ export async function exportModpack(
     includeResourcepacks,
     includeShaderpacks,
     includeSaves,
+    selectedSaves: selectedSaves || null,
   });
+}
+
+export async function listInstanceAssets(instancePath: string): Promise<InstanceAssets> {
+  return invoke<InstanceAssets>('list_instance_assets_cmd', { instancePath });
 }
 
 export async function importModpack(
