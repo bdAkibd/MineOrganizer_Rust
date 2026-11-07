@@ -12,9 +12,12 @@
     ChevronDown,
     Plus,
     Check,
+    BookOpen,
   } from '@lucide/svelte';
+  import UserManualModal from '$lib/components/UserManualModal.svelte';
 
   let profileDropdownOpen = $state(false);
+  let manualModalOpen = $state(false);
   const current = $derived(appState.activeProfile);
 
   const navItems = [
@@ -39,7 +42,7 @@
       <h1 class="font-bold text-sm tracking-wide text-zinc-100">
         MineOrganizer
       </h1>
-      <p class="text-[11px] text-zinc-400">Next-Gen Mod Virtualizer</p>
+      <p class="text-[11px] text-zinc-400">{t('Next-Gen Mod Virtualizer')}</p>
     </div>
   </div>
 
@@ -61,6 +64,16 @@
         {/if}
       </button>
     {/each}
+
+    <div class="pt-2 my-2 border-t border-zinc-800/60">
+      <button
+        onclick={() => (manualModalOpen = true)}
+        class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 border border-transparent transition-all duration-150 group text-left"
+      >
+        <BookOpen class="w-4 h-4 text-zinc-400 group-hover:text-violet-400 transition-transform group-hover:scale-110" />
+        <span class="truncate">{t('User Manual')}</span>
+      </button>
+    </div>
   </nav>
 
   <!-- Active Profile Selector Widget -->
@@ -123,9 +136,13 @@
         <span class="font-mono text-zinc-300 font-semibold">{current.enabled_mod_hashes.length}</span>
       </div>
       <div class="text-[10px] text-zinc-400 flex items-center justify-between px-1">
-        <span>Minecraft:</span>
+        <span>{t('Game Version')}:</span>
         <span class="font-mono text-zinc-300 font-semibold">{current.minecraft_version || '1.20.1'}</span>
       </div>
     {/if}
   </div>
 </aside>
+
+{#if manualModalOpen}
+  <UserManualModal onclose={() => (manualModalOpen = false)} />
+{/if}

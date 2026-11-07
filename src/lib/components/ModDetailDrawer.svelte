@@ -158,7 +158,7 @@
               {ldr}
             </span>
           {:else}
-            <span class="text-zinc-500">Not specified</span>
+            <span class="text-zinc-500">{t('Not specified')}</span>
           {/each}
         </div>
       </div>
@@ -172,7 +172,7 @@
               {mc}
             </span>
           {:else}
-            <span class="text-zinc-500">Not specified</span>
+            <span class="text-zinc-500">{t('Not specified')}</span>
           {/each}
         </div>
       </div>

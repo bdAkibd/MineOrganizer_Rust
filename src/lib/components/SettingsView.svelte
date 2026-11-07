@@ -11,10 +11,13 @@
     Info,
     Shield,
     Sparkles,
+    BookOpen,
   } from '@lucide/svelte';
+  import UserManualModal from '$lib/components/UserManualModal.svelte';
 
   let currentSettings = $state({ ...appState.userData.settings });
   let newPathInput = $state('');
+  let manualModalOpen = $state(false);
 
   function handleAddPath() {
     if (!newPathInput.trim()) return;
@@ -143,7 +146,7 @@
       </div>
     </div>
 
-    <!-- Launch & Virtualization Preferences -->
+    <!-- Virtualization Preferences -->
     <div class="p-5 rounded-2xl bg-zinc-900/60 border border-[#27272a] space-y-3">
       <div class="flex items-center gap-2 text-zinc-100 font-semibold text-xs">
         <Shield class="w-4 h-4 text-emerald-400" />
@@ -160,13 +163,38 @@
       </label>
     </div>
 
+    <!-- Help & Documentation -->
+    <div class="p-5 rounded-2xl bg-zinc-900/60 border border-[#27272a] flex items-center justify-between">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2 text-zinc-100 font-semibold text-xs">
+          <BookOpen class="w-4 h-4 text-violet-400" />
+          <span>{t('User Manual & Documentation')}</span>
+        </div>
+        <p class="text-xs text-zinc-400">
+          {t('Read the complete user guide and manuals in multiple languages')}
+        </p>
+      </div>
+
+      <button
+        onclick={() => (manualModalOpen = true)}
+        class="flex items-center gap-2 px-3.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700/60 rounded-lg text-xs font-medium transition-all shadow-sm"
+      >
+        <BookOpen class="w-3.5 h-3.5 text-violet-400" />
+        <span>{t('Open User Manual')}</span>
+      </button>
+    </div>
+
     <!-- About App -->
     <div class="p-5 rounded-2xl bg-zinc-900/30 border border-[#27272a]/60 text-xs text-zinc-400 space-y-1.5">
       <div class="font-semibold text-zinc-200 flex items-center gap-2">
         <Sparkles class="w-4 h-4 text-violet-400" />
         <span>MineOrganizer</span>
       </div>
-      <p>High-performance transactional Minecraft mod manager with zero-overhead virtualization.</p>
+      <p>{t('High-performance transactional Minecraft mod manager with zero-overhead virtualization.')}</p>
     </div>
   </div>
 </div>
+
+{#if manualModalOpen}
+  <UserManualModal onclose={() => (manualModalOpen = false)} />
+{/if}

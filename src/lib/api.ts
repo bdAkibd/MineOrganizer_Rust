@@ -337,3 +337,11 @@ export async function getAppDataDir(): Promise<string> {
 export async function openPathInExplorer(path: string): Promise<boolean> {
   return invoke<boolean>('open_path_in_explorer_cmd', { path });
 }
+
+// ============================================================================
+// User Manual
+// ============================================================================
+
+export async function getUserManual(locale?: string | null): Promise<string> {
+  return invoke<string>('get_user_manual_cmd', { locale: locale || null });
+}

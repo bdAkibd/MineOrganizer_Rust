@@ -9,6 +9,7 @@ use commands::instances::{
     discover_instance_environments, get_default_candidate_paths, get_default_prism_path,
     scan_all_instances, scan_single_directory,
 };
+use commands::manual::get_user_manual_cmd;
 use commands::library::{
     check_mod_compatibility_cmd, delete_mod_file_cmd, import_files_to_library_cmd,
     parse_single_mod, save_binary_to_library_cmd, scan_library_mods,
@@ -78,6 +79,8 @@ pub fn run() {
             set_mod_tags_cmd,
             get_app_data_dir_cmd,
             open_path_in_explorer_cmd,
+            // Manual
+            get_user_manual_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
