@@ -3,7 +3,7 @@ use tauri::command;
 
 use crate::core::network::modrinth::{
     check_mod_updates, download_file, get_project_versions, search_modrinth,
-    ModrinthSearchResult, ModrinthVersion, ModUpdateInfo,
+    ModrinthSearchResponse, ModrinthVersion, ModUpdateInfo,
 };
 
 #[command]
@@ -13,7 +13,7 @@ pub async fn search_modrinth_cmd(
     minecraft_version: String,
     limit: usize,
     offset: usize,
-) -> Result<Vec<ModrinthSearchResult>, String> {
+) -> Result<ModrinthSearchResponse, String> {
     search_modrinth(&query, &loader, &minecraft_version, limit, offset).await
 }
 

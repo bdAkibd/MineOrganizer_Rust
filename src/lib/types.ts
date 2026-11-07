@@ -133,6 +133,13 @@ export interface ModrinthSearchResult {
   loaders: string[];
 }
 
+export interface ModrinthSearchResponse {
+  hits: ModrinthSearchResult[];
+  total_hits: number;
+  offset: number;
+  limit: number;
+}
+
 export interface ModrinthVersionFile {
   url: string;
   filename: string;

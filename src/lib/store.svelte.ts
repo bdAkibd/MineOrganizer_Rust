@@ -238,13 +238,10 @@ class AppState {
 
   async setActiveProfile(profileId: string) {
     this.userData.active_profile_id = profileId;
-    const prof = this.userData.profiles.find((p) => p.id === profileId);
-    if (prof) {
-      try {
-        await api.saveProfileItem(prof);
-      } catch (e) {
-        // Ignored
-      }
+    try {
+      await api.setActiveProfileItem(profileId);
+    } catch (e: any) {
+      console.warn('Failed to persist active profile setting:', e);
     }
   }
 

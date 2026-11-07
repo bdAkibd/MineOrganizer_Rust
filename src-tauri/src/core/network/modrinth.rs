@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
 
-pub const APP_USER_AGENT: &str = "MineOrganizer/2.0 (https://github.com/MainOrganizer)";
+pub const APP_USER_AGENT: &str = "MineOrganizer (https://github.com/MainOrganizer)";
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ModrinthSearchResult {
@@ -24,6 +24,14 @@ pub struct ModrinthSearchResult {
     pub versions: Vec<String>,
     #[serde(default)]
     pub loaders: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ModrinthSearchResponse {
+    pub hits: Vec<ModrinthSearchResult>,
+    pub total_hits: usize,
+    pub offset: usize,
+    pub limit: usize,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -99,7 +107,7 @@ pub async fn search_modrinth(
     minecraft_version: &str,
     limit: usize,
     offset: usize,
-) -> Result<Vec<ModrinthSearchResult>, String> {
+) -> Result<ModrinthSearchResponse, String> {
     let client = create_client()?;
 
     let mut facets: Vec<Vec<String>> = vec![vec!["project_type:mod".to_string()]];
@@ -116,10 +124,17 @@ pub async fn search_modrinth(
 
     let facets_json = serde_json::to_string(&facets).map_err(|e| e.to_string())?;
 
+    let sort_index = if query.trim().is_empty() {
+        "downloads"
+    } else {
+        "relevance"
+    };
+
     let res = client
         .get("https://api.modrinth.com/v2/search")
         .query(&[
             ("query", query),
+            ("index", sort_index),
             ("limit", &limit.to_string()),
             ("offset", &offset.to_string()),
             ("facets", &facets_json),
@@ -136,6 +151,10 @@ pub async fn search_modrinth(
         .json()
         .await
         .map_err(|e| format!("Failed to parse Modrinth search JSON: {}", e))?;
+
+    let total_hits = body.get("total_hits").and_then(|v| v.as_u64()).unwrap_or(0) as usize;
+    let resp_offset = body.get("offset").and_then(|v| v.as_u64()).unwrap_or(offset as u64) as usize;
+    let resp_limit = body.get("limit").and_then(|v| v.as_u64()).unwrap_or(limit as u64) as usize;
 
     let hits = body.get("hits").and_then(|h| h.as_array()).ok_or("No hits in response")?;
 
@@ -176,7 +195,12 @@ pub async fn search_modrinth(
         });
     }
 
-    Ok(results)
+    Ok(ModrinthSearchResponse {
+        hits: results,
+        total_hits,
+        offset: resp_offset,
+        limit: resp_limit,
+    })
 }
 
 /// Fetch version list for a specific project filtered by loader and version.

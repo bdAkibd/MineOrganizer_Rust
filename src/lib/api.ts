@@ -8,6 +8,7 @@ import type {
   ModpackExportReport,
   ModpackImportResult,
   ModpackInspectResult,
+  ModrinthSearchResponse,
   ModrinthSearchResult,
   ModrinthVersion,
   ModUpdateInfo,
@@ -178,10 +179,10 @@ export async function searchModrinth(
   query: string,
   loader: string = '',
   minecraftVersion: string = '',
-  limit: number = 20,
+  limit: number = 24,
   offset: number = 0
-): Promise<ModrinthSearchResult[]> {
-  return invoke<ModrinthSearchResult[]>('search_modrinth_cmd', {
+): Promise<ModrinthSearchResponse> {
+  return invoke<ModrinthSearchResponse>('search_modrinth_cmd', {
     query,
     loader,
     minecraftVersion,
@@ -288,4 +289,16 @@ export async function saveAppSettings(settings: AppSettings): Promise<boolean> {
 
 export async function setModTags(sha256: string, tags: string[]): Promise<boolean> {
   return invoke<boolean>('set_mod_tags_cmd', { sha256, tags });
+}
+
+export async function setActiveProfileItem(profileId: string | null): Promise<boolean> {
+  return invoke<boolean>('set_active_profile_cmd', { profileId });
+}
+
+export async function getAppDataDir(): Promise<string> {
+  return invoke<string>('get_app_data_dir_cmd');
+}
+
+export async function openPathInExplorer(path: string): Promise<boolean> {
+  return invoke<boolean>('open_path_in_explorer_cmd', { path });
 }

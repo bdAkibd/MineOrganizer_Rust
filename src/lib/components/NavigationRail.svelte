@@ -36,9 +36,8 @@
       </div>
     </div>
     <div>
-      <h1 class="font-bold text-sm tracking-wide text-zinc-100 flex items-center gap-1.5">
+      <h1 class="font-bold text-sm tracking-wide text-zinc-100">
         MineOrganizer
-        <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-400 border border-violet-500/30 font-semibold">Rust</span>
       </h1>
       <p class="text-[11px] text-zinc-400">Next-Gen Mod Virtualizer</p>
     </div>

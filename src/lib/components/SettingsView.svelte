@@ -164,7 +164,7 @@
     <div class="p-5 rounded-2xl bg-zinc-900/30 border border-[#27272a]/60 text-xs text-zinc-400 space-y-1.5">
       <div class="font-semibold text-zinc-200 flex items-center gap-2">
         <Sparkles class="w-4 h-4 text-violet-400" />
-        <span>MineOrganizer 2.0 (Rust + Tauri + Svelte 5)</span>
+        <span>MineOrganizer</span>
       </div>
       <p>High-performance transactional Minecraft mod manager with zero-overhead virtualization.</p>
     </div>

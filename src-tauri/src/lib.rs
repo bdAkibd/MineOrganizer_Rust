@@ -16,7 +16,8 @@ use commands::modrinth::{
     search_modrinth_cmd,
 };
 use commands::profiles::{
-    delete_profile_cmd, load_user_data_cmd, save_profile_cmd, save_settings_cmd, set_mod_tags_cmd,
+    delete_profile_cmd, get_app_data_dir_cmd, load_user_data_cmd, open_path_in_explorer_cmd,
+    save_profile_cmd, save_settings_cmd, set_active_profile_cmd, set_mod_tags_cmd,
 };
 use commands::virtualization::{apply_profile_cmd, preview_profile_cmd, rollback_last_cmd};
 
@@ -63,8 +64,11 @@ pub fn run() {
             load_user_data_cmd,
             save_profile_cmd,
             delete_profile_cmd,
+            set_active_profile_cmd,
             save_settings_cmd,
             set_mod_tags_cmd,
+            get_app_data_dir_cmd,
+            open_path_in_explorer_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
