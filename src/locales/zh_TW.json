@@ -548,5 +548,14 @@
   "No filter": "無篩選",
   "No versions found": "未找到版本",
   "versions": "個版本",
-  "Reset filter": "重設篩選"
+  "Reset filter": "重設篩選",
+  "No versions available for download": "沒有可供下載的版本",
+  "No downloadable file in latest version": "最新版本中沒有可下載的檔案",
+  "Downloaded": "已下載",
+  "Quick Install": "快速安裝",
+  "Open on Modrinth": "在 Modrinth 上開啟",
+  "downloads": "次下載",
+  "Quick Download Latest Version": "快速下載最新版本",
+  "Select specific version": "選擇特定版本",
+  "Versions": "版本"
 }

@@ -548,5 +548,14 @@
   "No filter": "Без фильтра",
   "No versions found": "Версии не найдены",
   "versions": "версий",
-  "Reset filter": "Сбросить фильтр"
+  "Reset filter": "Сбросить фильтр",
+  "No versions available for download": "Нет доступных версий для скачивания",
+  "No downloadable file in latest version": "В последней версии нет доступных файлов",
+  "Downloaded": "Скачан",
+  "Quick Install": "Быстрая установка",
+  "Open on Modrinth": "Открыть на Modrinth",
+  "downloads": "скачиваний",
+  "Quick Download Latest Version": "Быстро скачать последнюю версию",
+  "Select specific version": "Выбрать конкретную версию",
+  "Versions": "Версии"
 }

@@ -548,5 +548,14 @@
   "No filter": "フィルターなし",
   "No versions found": "バージョンが見つかりません",
   "versions": "バージョン",
-  "Reset filter": "フィルターをリセット"
+  "Reset filter": "フィルターをリセット",
+  "No versions available for download": "ダウンロード可能なバージョンがありません",
+  "No downloadable file in latest version": "最新バージョンにダウンロード可能なファイルがありません",
+  "Downloaded": "ダウンロード完了",
+  "Quick Install": "クイックインストール",
+  "Open on Modrinth": "Modrinthで開く",
+  "downloads": "ダウンロード",
+  "Quick Download Latest Version": "最新バージョンを素早くダウンロード",
+  "Select specific version": "特定のバージョンを選択",
+  "Versions": "バージョン"
 }

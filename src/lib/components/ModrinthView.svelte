@@ -8,6 +8,7 @@
   } from '$lib/api';
   import type { ModrinthSearchResult, ModrinthVersion } from '$lib/types';
   import MinecraftVersionSelect from '$lib/components/MinecraftVersionSelect.svelte';
+  import { contextMenu } from '$lib/contextMenu.svelte';
   import {
     Search,
     Store,
@@ -19,6 +20,8 @@
     Filter,
     ChevronLeft,
     ChevronRight,
+    Zap,
+    Loader2,
   } from '@lucide/svelte';
 
   let query = $state('');
@@ -54,6 +57,72 @@
   let projectVersions = $state<ModrinthVersion[]>([]);
   let isLoadingVersions = $state(false);
   let downloadingVersionId = $state<string | null>(null);
+  let downloadingProjectIds = $state<string[]>([]);
+
+  async function handleQuickDownload(project: ModrinthSearchResult) {
+    if (downloadingProjectIds.includes(project.project_id)) return;
+    downloadingProjectIds = [...downloadingProjectIds, project.project_id];
+
+    try {
+      // 1. Fetch versions for current filters
+      let versions = await getProjectVersions(project.project_id, loaderFilter, versionFilter);
+
+      // If no versions match current strict filters, fallback to 'all'
+      if (!versions || versions.length === 0) {
+        versions = await getProjectVersions(project.project_id, 'all', 'all');
+      }
+
+      if (!versions || versions.length === 0) {
+        appState.showToast(t('No versions available for download'), 'error');
+        return;
+      }
+
+      const latestVer = versions[0];
+      const file = latestVer.files.find((f) => f.primary) || latestVer.files[0];
+      if (!file) {
+        appState.showToast(t('No downloadable file in latest version'), 'error');
+        return;
+      }
+
+      const libDir = appState.userData.settings.library_dir || './mods_library';
+      await downloadModrinthFile(file.url, file.filename, libDir);
+
+      appState.showToast(
+        `${t('Downloaded')} "${project.title}" (${latestVer.version_number || latestVer.name})!`,
+        'success'
+      );
+      await appState.refreshLibraryMods();
+    } catch (e: any) {
+      appState.showToast(`Download failed: ${e?.message || e}`, 'error');
+    } finally {
+      downloadingProjectIds = downloadingProjectIds.filter((id) => id !== project.project_id);
+    }
+  }
+
+  function handleCardContextMenu(e: MouseEvent, item: ModrinthSearchResult) {
+    contextMenu.open(e, [
+      {
+        label: t('Quick Install'),
+        icon: Zap,
+        action: () => handleQuickDownload(item),
+      },
+      {
+        label: t('Install / Versions'),
+        icon: Layers,
+        action: () => handleOpenVersions(item),
+      },
+      { separator: true, label: '', action: () => {} },
+      {
+        label: t('Open on Modrinth'),
+        icon: ExternalLink,
+        action: () => {
+          if (typeof window !== 'undefined') {
+            window.open(`https://modrinth.com/mod/${item.slug || item.project_id}`, '_blank');
+          }
+        },
+      },
+    ]);
+  }
 
   async function handleSearch(newPage: number = 1) {
     currentPage = newPage;
@@ -177,7 +246,12 @@
     {:else}
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {#each searchResults as item}
-          <div class="p-4 rounded-xl bg-zinc-900/60 border border-[#27272a] hover:border-zinc-700 hover:bg-zinc-900/90 transition-all flex flex-col justify-between">
+          {@const isQuickDownloading = downloadingProjectIds.includes(item.project_id)}
+          <div
+            role="article"
+            oncontextmenu={(e) => handleCardContextMenu(e, item)}
+            class="p-4 rounded-xl bg-zinc-900/60 border border-[#27272a] hover:border-zinc-700 hover:bg-zinc-900/90 transition-all flex flex-col justify-between"
+          >
             <div class="space-y-3">
               <!-- Top Header: Icon & Title -->
               <div class="flex items-start gap-3">
@@ -216,19 +290,47 @@
               </div>
             </div>
 
-            <!-- Footer: Downloads and Button -->
+            <!-- Footer: Downloads and Buttons -->
             <div class="pt-3 border-t border-zinc-800/60 flex items-center justify-between gap-2 mt-4 text-xs">
-              <span class="text-zinc-500 font-mono text-[11px]">
-                {(item.downloads / 1000).toFixed(0)}k downloads
+              <span class="text-zinc-500 font-mono text-[11px] truncate">
+                {(item.downloads / 1000).toFixed(0)}k {t('downloads')}
               </span>
 
-              <button
-                onclick={() => handleOpenVersions(item)}
-                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-violet-600/15 hover:bg-violet-600 text-violet-300 hover:text-white border border-violet-500/30 transition-all shadow-sm"
-              >
-                <Download class="w-3.5 h-3.5" />
-                <span>{t('Install / Versions')}</span>
-              </button>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <!-- Quick Download Button -->
+                <button
+                  type="button"
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    handleQuickDownload(item);
+                  }}
+                  disabled={isQuickDownloading}
+                  title={t('Quick Download Latest Version')}
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-violet-600 hover:bg-violet-500 text-white shadow-md shadow-violet-950/40 transition-all disabled:opacity-50"
+                >
+                  {#if isQuickDownloading}
+                    <Loader2 class="w-3.5 h-3.5 animate-spin" />
+                    <span>{t('Downloading...')}</span>
+                  {:else}
+                    <Zap class="w-3.5 h-3.5 fill-current" />
+                    <span>{t('Quick Install')}</span>
+                  {/if}
+                </button>
+
+                <!-- Versions Drawer Button -->
+                <button
+                  type="button"
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    handleOpenVersions(item);
+                  }}
+                  title={t('Select specific version')}
+                  class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 border border-zinc-700/60 transition-colors"
+                >
+                  <Layers class="w-3.5 h-3.5 text-zinc-400" />
+                  <span class="hidden sm:inline">{t('Versions')}</span>
+                </button>
+              </div>
             </div>
           </div>
         {/each}

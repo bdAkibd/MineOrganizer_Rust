@@ -548,5 +548,14 @@
   "No filter": "Nessun filtro",
   "No versions found": "Nessuna versione trovata",
   "versions": "versioni",
-  "Reset filter": "Reimposta filtro"
+  "Reset filter": "Reimposta filtro",
+  "No versions available for download": "Nessuna versione disponibile per il download",
+  "No downloadable file in latest version": "Nessun file scaricabile nell'ultima versione",
+  "Downloaded": "Scaricato",
+  "Quick Install": "Installazione rapida",
+  "Open on Modrinth": "Apri su Modrinth",
+  "downloads": "download",
+  "Quick Download Latest Version": "Download rapido dell'ultima versione",
+  "Select specific version": "Seleziona versione specifica",
+  "Versions": "Versioni"
 }
