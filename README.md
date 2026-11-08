@@ -3,7 +3,7 @@
 > A modern desktop Minecraft mod and environment manager with virtualized libraries, complete modpack sharing, and automated diagnostics.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-informational)](#)
+[![Platform](https://img.shields.io/badge/Platform-Windows-informational)](#)
 [![Internationalization](https://img.shields.io/badge/Languages-11%20Locales-brightgreen)](#)
 
 ---
